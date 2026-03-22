@@ -3,103 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hay-Stats PRO | Հայաստանի Մեծագույն Աթլետը</title>
+    <title>HAY-STATS PRO | Հայաստանի Մեծագույն Աթլետը</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #121212; color: white; margin: 0; display: flex; flex-direction: column; align-items: center; }
-        header { background: linear-gradient(135deg, #d4af37 0%, #8a6d3b 100%); width: 100%; padding: 30px 0; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
-        h1 { margin: 0; letter-spacing: 2px; text-transform: uppercase; }
-        .main-container { max-width: 1200px; width: 95%; margin: 30px auto; display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; color: white; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        header { background: linear-gradient(180deg, #d4af37, #8a6d3b); width: 100%; padding: 25px 0; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-bottom: 2px solid #8a6d3b; }
+        h1 { margin: 0; font-size: 2.2em; text-transform: uppercase; }
+        h1::after { content: " PRO"; color: black; font-weight: bold; }
         
-        .card { background: #1e1e1e; padding: 25px; border-radius: 20px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .main-container { max-width: 1200px; width: 95%; margin: 30px auto; display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        
+        .card { background: #222222; padding: 25px; border-radius: 15px; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
         /* Համեմատության բաժին */
-        .selectors { display: flex; justify-content: space-between; margin-bottom: 30px; }
-        select { padding: 12px; border-radius: 8px; background: #2a2a2a; color: #ffd700; border: 1px solid #ffd700; width: 48%; font-size: 16px; outline: none; }
-        .comparison-display { display: flex; justify-content: space-around; align-items: center; }
-        .athlete-info { text-align: center; width: 150px; }
-        .athlete-info img { width: 120px; height: 120px; border-radius: 50%; border: 3px solid #ffd700; object-fit: cover; margin-bottom: 10px; transition: 0.3s; }
-        .chart-box { width: 400px; height: 400px; }
+        .comparison-section { display: flex; flex-direction: column; }
+        .selectors { display: flex; justify-content: space-around; margin-bottom: 30px; }
+        select { padding: 10px; border-radius: 5px; background: #333; color: gold; border: 1px solid gold; width: 45%; font-size: 16px; cursor: pointer; }
+        
+        .legend-box { text-align: left; margin-bottom: 15px; }
+        .legend-item { display: flex; align-items: center; font-size: 0.9em; color: #aaa; margin-bottom: 5px; }
+        .legend-rect { width: 15px; height: 15px; margin-right: 10px; border: 1px solid; }
+
+        .comparison-display { display: flex; justify-content: space-around; align-items: center; margin-top: -30px; }
+        .chart-box { width: 350px; height: 350px; }
+        .athlete-card { text-align: center; width: 160px; position: relative; }
+        .athlete-card .avatar { width: 130px; height: 130px; border-radius: 50%; border: 3px solid gold; object-fit: cover; margin-bottom: 10px; position: relative; z-child: 1; }
+        .athlete-card h3 { font-size: 1.1em; color: white; margin-top: 10px; position: relative; z-child: 1; }
+        .placeholder { position: absolute; top: 0; left: 0; width: 130px; height: 130px; border-radius: 50%; border: 3px solid #ffd700; background-color: #ffd700; z-child: 0; }
 
         /* Լաբորատորիա */
-        .lab-title { color: #ffd700; text-align: center; margin-top: 0; }
-        .slider-box { margin-bottom: 20px; }
-        .slider-box label { display: flex; justify-content: space-between; font-size: 0.9em; margin-bottom: 8px; color: #ccc; }
-        input[type="range"] { width: 100%; accent-color: #ffd700; cursor: pointer; }
+        .lab-title { color: white; text-align: center; margin-top: 0; font-weight: 300; font-size: 1.8em; }
+        .lab-title strong { font-weight: bold; }
+        .slider-box { margin-bottom: 15px; }
+        .slider-box label { display: flex; justify-content: space-between; font-size: 0.9em; margin-bottom: 8px; color: #ffd700; font-weight: bold;}
+        .slider-box label small { color: #aaa; font-weight: normal; margin-left: 5px; }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: #ffd700; }
         
-        .btn-goat { background: linear-gradient(90deg, #d4af37, #b8860b); color: black; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-goat:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4); }
+        button#goatBtn { background: linear-gradient(90deg, #d4af37, #8a6d3b); color: black; border: none; width: 100%; padding: 15px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
+        button#goatBtn:hover { transform: scale(1.03); box-shadow: 0 0 20px rgba(212, 175, 55, 0.8); }
+        
+        #resultArea { margin-top: 25px; padding: 20px; border: 1px solid gold; border-radius: 12px; display: none; text-align: center; }
+        #goat-title { color: #fff; text-transform: uppercase; font-size: 1em; }
+        #goat-name { font-size: 1.6em; color: gold; font-weight: bold; margin: 5px 0; }
+        #final-score-text { font-size: 0.9em; color: #ccc; }
+        
+        /* Ավելացված հաշվարկի բաժին */
+        .full-width-card { margin: 30px auto; max-width: 1200px; width: 95%; background: #252525; padding: 20px; border-radius: 15px; border: 1px solid #444; }
+        .calculation-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .calc-item { background: #333; padding: 15px; border-radius: 8px; border: 1px solid #555; text-align: left; }
+        .calc-item .formula { font-style: italic; color: #ffd700; font-weight: bold; font-size: 0.8em; }
+        .calc-item .details { color: #aaa; font-size: 0.8em; margin-top: 5px; }
+        .final-calc-result { margin-top: 20px; text-align: center; font-size: 1.1em; color: #ffd700; font-weight: bold;}
 
-        #result-box { margin-top: 20px; padding: 15px; border-radius: 12px; background: rgba(212, 175, 55, 0.1); border: 1px dashed #ffd700; display: none; text-align: center; }
-        .goat-name { font-size: 1.5em; color: #ffd700; font-weight: bold; margin: 5px 0; }
-
-        @media (max-width: 900px) { .main-container { grid-template-columns: 1fr; } .chart-box { width: 300px; height: 300px; } }
+        .footer { margin-top: 40px; text-align: center; font-size: 0.8em; color: #777; width: 100%; border-top: 1px solid #444; padding: 20px 0; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>HAY-STATS PRO</h1>
-    <p>Մաթեմատիկական Մոդելավորում | 10-րդ Դասարան</p>
+    <h1>HAY-STATS</h1>
+    <p>Մաթեմատիկական Լաբորատորիա | Կշռված Միջին</p>
 </header>
 
 <div class="main-container">
-    <div class="card">
+    <div class="card comparison-section">
         <div class="selectors">
             <select id="sel1" onchange="update()"></select>
             <select id="sel2" onchange="update()"></select>
         </div>
+        
+        <div class="legend-box">
+            <div class="legend-item"><div class="legend-rect" style="background-color: rgba(212, 175, 55, 0.2); border-color: #ffd700"></div><span id="label1">Էդուարդ Սպերցյան</span></div>
+            <div class="legend-item"><div class="legend-rect" style="background-color: rgba(255, 255, 255, 0.1); border-color: #fff"></div><span id="label2">Վարազդատ Լալայան</span></div>
+        </div>
+
         <div class="comparison-display">
-            <div class="athlete-info">
-                <img id="img1" src="" alt="">
-                <h3 id="name1"></h3>
+            <div class="athlete-card">
+                <div class="placeholder"></div>
+                <img id="img1" src="" alt="" class="avatar">
+                <h3 id="name1">Էդուարդ Սպերցյան</h3>
             </div>
             <div class="chart-box">
                 <canvas id="myChart"></canvas>
             </div>
-            <div class="athlete-info">
-                <img id="img2" src="" alt="">
-                <h3 id="name2"></h3>
+            <div class="athlete-card">
+                <div class="placeholder"></div>
+                <img id="img2" src="" alt="" class="avatar">
+                <h3 id="name2">Վարազդատ Լալայան</h3>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <h2 class="lab-title">Լաբորատորիա</h2>
-        <p style="font-size: 0.8em; color: #888; text-align: center;">Սահմանիր հատկանիշների կարևորությունը (կշիռները)</p>
+    <div class="card lab-section">
+        <h2 class="lab-title">Կշիռների <strong>Լաբորատորիա</strong></h2>
+        <p style="font-size: 0.8em; color: #aaa; text-align: center;">Ընտրիր, թե որքանով է կարևոր յուրաքանչյուր հատկանիշը:</p>
         
         <div id="sliders"></div>
 
-        <button class="btn-goat" onclick="calculateGOAT()">🥇 ԳՏՆԵԼ ԼԱՎԱԳՈՒՅՆԻՆ</button>
-
-        <div id="result-box">
-            <span>Ըստ ձեր մոդելի՝ լավագույնն է</span>
-            <div id="goat-name" class="goat-name"></div>
-            <small id="goat-score"></small>
+        <button id="goatBtn" onclick="calculateGOAT()">🥇 ԳՏՆԵԼ GOAT-ին</button>
+        
+        <div id="resultArea">
+            <p id="goat-title">Հայաստանի Մեծագույն Աթլետը</p>
+            <p id="goat-name"></p>
+            <p id="final-score-text">Վերջնական միավորը` <span id="goat-score"></span> / 100</p>
         </div>
     </div>
 </div>
 
+<div class="card full-width-card" id="calculation-section">
+    <h2>Մաթեմատիկական հաշվարկ</h2>
+    <p>Ընտրված կշիռները՝ w₁ = 0.2, w₂ = 0.2, w₃ = 0.2, w₄ = 0.2, w₅ = 0.2</p>
+    
+    <div class="calculation-grid">
+        <div class="calc-item">
+            <div>Ուժ (Power)</div>
+            <div class="formula">20% × 90 = 18.0</div>
+            <div class="details">w₁ × x₁ = 0.2 × 90</div>
+        </div>
+        <div class="calc-item">
+            <div>Դիմացկունություն</div>
+            <div class="formula">20% × 85 = 17.0</div>
+            <div class="details">w₂ × x₂ = 0.2 × 85</div>
+        </div>
+        <div class="calc-item">
+            <div>Տեխնիկա (Technique)</div>
+            <div class="formula">20% × 95 = 19.0</div>
+            <div class="details">w₃ × x₃ = 0.2 × 95</div>
+        </div>
+        <div class="calc-item">
+            <div>Արագություն (Speed)</div>
+            <div class="formula">20% × 90 = 18.0</div>
+            <div class="details">w₄ × x₄ = 0.2 × 90</div>
+        </div>
+        <div class="calc-item">
+            <div>Փորձ (Experience)</div>
+            <div class="formula">20% × 90 = 18.0</div>
+            <div class="details">w₅ × x₅ = 0.2 × 90</div>
+        </div>
+    </div>
+    
+    <div class="final-calc-result">
+        Վերջնական գումարը = 18.0 + 17.0 + 19.0 + 18.0 + 18.0 = 90.0 միավոր
+    </div>
+</div>
+
+<div class="footer">Նախագծված է 10-րդ դասարանի բաց դասի համար © 2026</div>
+
 <script>
 // Տվյալների բազա
 const athletes = [
-    { id: 0, name: "Արման Ծառուկյան", sport: "MMA", stats: [88, 95, 92, 90, 82], img: "images/arman.jpg" },
-    { id: 1, name: "Արթուր Ալեքսանյան", sport: "Ըմբշամարտ", stats: [98, 92, 96, 78, 100], img: "images/artur.jpg" },
-    { id: 2, name: "Գենրիխ Մխիթարյան", sport: "Ֆուտբոլ", stats: [72, 88, 98, 85, 95], img: "images/heno.jpg" },
-    { id: 3, name: "Վարազդատ Լալայան", sport: "Ծանրամարտ", stats: [100, 65, 88, 72, 85], img: "images/varazdat.jpg" },
-    { id: 4, name: "Լևոն Արոնյան", sport: "Շախմատ", stats: [40, 80, 100, 60, 98], img: "images/levon.jpg" },
-    { id: 5, name: "Էդուարդ Սպերցյան", sport: "Ֆուտբոլ", stats: [75, 85, 92, 88, 75], img: "images/spertsyan.jpg" }
+    { id: 0, name: "Արման Ծառուկյան", stats: [88, 95, 92, 90, 82], img: "images/arman.jpg" },
+    { id: 1, name: "Արթուր Ալեքսանյան", stats: [98, 92, 96, 78, 100], img: "images/artur.jpg" },
+    { id: 2, name: "Գենրիխ Մխիթարյան", stats: [72, 88, 98, 85, 95], img: "images/heno.jpg" },
+    { id: 3, name: "Վարազդատ Լալայան", stats: [100, 65, 88, 72, 85], img: "images/varazdat.jpg" },
+    { id: 4, name: "Լևոն Արոնյան", stats: [40, 80, 100, 60, 98], img: "images/levon.jpg" },
+    { id: 5, name: "Էդուարդ Սպերցյան", stats: [75, 85, 92, 88, 75], img: "images/spertsyan.jpg" }
 ];
 
-const labels = ['Ուժ', 'Դիմացկունություն', 'Տեխնիկա', 'Արագություն', 'Փորձ'];
+const labelsHy = ['Ուժ', 'Դիմացկունություն', 'Տեխնիկա', 'Արագություն', 'Փորձ'];
+const labelsEng = ['Power', '', 'Technique', 'Speed', 'Experience'];
 let myChart;
 
 // Սլայդերների ստեղծում
 const sliderContainer = document.getElementById('sliders');
-labels.forEach((label, i) => {
+labelsHy.forEach((label, i) => {
     sliderContainer.innerHTML += `
         <div class="slider-box">
-            <label>${label} <span id="val${i}">20%</span></label>
+            <label>${label} <small>(${labelsEng[i]})</small> <span id="val${i}">20%</span></label>
             <input type="range" id="w${i}" min="0" max="100" value="20" oninput="syncWeights()">
         </div>
     `;
@@ -112,7 +182,8 @@ function init() {
         s1.innerHTML += `<option value="${a.id}">${a.name}</option>`;
         s2.innerHTML += `<option value="${a.id}">${a.name}</option>`;
     });
-    s2.selectedIndex = 1;
+    s1.selectedIndex = 5; // Spertsyan
+    s2.selectedIndex = 3; // Lalayan
     update();
 }
 
@@ -132,15 +203,18 @@ function update() {
     
     document.getElementById('img1').src = a1.img;
     document.getElementById('name1').innerText = a1.name;
+    document.getElementById('label1').innerText = a1.name;
+    
     document.getElementById('img2').src = a2.img;
     document.getElementById('name2').innerText = a2.name;
+    document.getElementById('label2').innerText = a2.name;
 
     if (myChart) myChart.destroy();
     const ctx = document.getElementById('myChart').getContext('2d');
     myChart = new Chart(ctx, {
         type: 'radar',
         data: {
-            labels: labels,
+            labels: labelsHy,
             datasets: [
                 { label: a1.name, data: a1.stats, backgroundColor: 'rgba(212, 175, 55, 0.2)', borderColor: '#ffd700', borderWidth: 2 },
                 { label: a2.name, data: a2.stats, backgroundColor: 'rgba(255, 255, 255, 0.1)', borderColor: '#fff', borderWidth: 2 }
@@ -170,9 +244,52 @@ function calculateGOAT() {
         if(score > maxS) { maxS = score; best = a; }
     });
 
-    document.getElementById('result-box').style.display = 'block';
+    document.getElementById('resultArea').style.display = 'block';
     document.getElementById('goat-name').innerText = best.name;
-    document.getElementById('goat-score').innerText = "Միավորը՝ " + maxS.toFixed(1) + " / 100";
+    document.getElementById('goat-score').innerText = maxS.toFixed(1);
+
+    // Թարմացնել հաշվարկի բաժինը
+    updateCalculationSection(best, w, totalW, maxS);
+}
+
+function updateCalculationSection(bestAthlete, weights, totalWeights, finalScore) {
+    const section = document.getElementById('calculation-section');
+    section.style.display = 'block';
+    
+    // Թարմացնել կշիռների տեքստը
+    let weightsText = "Ընտրված կշիռները՝";
+    weights.forEach((w, i) => {
+        let p = w/totalWeights;
+        weightsText += ` w${i+1} = ${p.toFixed(1)},`;
+    });
+    weightsText = weightsText.slice(0, -1);
+    section.querySelector('p').innerText = weightsText;
+    
+    // Թարմացնել հաշվարկի տարրերը
+    const grid = section.querySelector('.calculation-grid');
+    grid.innerHTML = '';
+    labelsHy.forEach((label, i) => {
+        let pPercent = weights[i]/totalWeights;
+        let stat = bestAthlete.stats[i];
+        let subtotal = pPercent * stat;
+        
+        grid.innerHTML += `
+            <div class="calc-item">
+                <div>${label} <small>(${labelsEng[i]})</small></div>
+                <div class="formula">${(pPercent*100).toFixed(0)}% × ${stat} = ${subtotal.toFixed(1)}</div>
+                <div class="details">w${i+1} × x${i+1} = ${pPercent.toFixed(1)} × ${stat}</div>
+            </div>
+        `;
+    });
+    
+    // Թարմացնել վերջնական գումարը
+    let finalFormula = "Վերջնական գումարը = ";
+    for (let i = 0; i < 5; i++) {
+        finalFormula += (weights[i]/totalWeights * bestAthlete.stats[i]).toFixed(1) + " + ";
+    }
+    finalFormula = finalFormula.slice(0, -3); // remove last " + "
+    finalFormula += ` = ${finalScore.toFixed(1)} միավոր`;
+    section.querySelector('.final-calc-result').innerText = finalFormula;
 }
 
 init();
