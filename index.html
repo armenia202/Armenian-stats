@@ -18,15 +18,13 @@
         .page { display: none; background: #1e1e1e; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
         .active-page { display: block; }
 
-        /* Բաժին 1. Համեմատություն */
         .selectors { display: flex; justify-content: space-between; margin-bottom: 30px; }
         select { padding: 12px; border-radius: 8px; background: #2a2a2a; color: gold; border: 1px solid gold; width: 48%; font-size: 16px; outline: none; }
         .comparison-display { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; }
         .athlete-info { text-align: center; width: 150px; }
         .athlete-info img { width: 130px; height: 130px; border-radius: 50%; border: 3px solid gold; object-fit: cover; margin-bottom: 10px; }
-        .chart-box { width: 400px; height: 400px; }
+        .chart-box { width: 450px; height: 400px; }
 
-        /* Բաժին 2. Հաշվարկ */
         .slider-box { margin-bottom: 20px; }
         .slider-box label { display: flex; justify-content: space-between; font-weight: bold; color: #ddd; margin-bottom: 8px; }
         input[type="range"] { width: 100%; accent-color: gold; cursor: pointer; }
@@ -34,9 +32,9 @@
         #result-area { margin-top: 25px; padding: 20px; border-radius: 12px; background: rgba(212, 175, 55, 0.05); border: 1px dashed gold; display: none; text-align: center; }
         .math-formula { font-family: monospace; background: #000; padding: 15px; border-radius: 8px; color: #0f0; margin-top: 15px; text-align: left; font-size: 13px; }
 
-        /* Բաժին 3. Օրվա Գրաֆիկ */
-        .schedule-container { display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap; margin-top: 20px; }
-        #scheduleImg { width: 220px; height: 220px; border-radius: 15px; border: 2px solid gold; object-fit: cover; }
+        .schedule-container { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 20px; }
+        #scheduleImg { width: 150px; height: 150px; border-radius: 50%; border: 2px solid gold; object-fit: cover; }
+        .line-chart-box { width: 100%; max-width: 800px; height: 350px; background: #252525; padding: 20px; border-radius: 15px; }
     </style>
 </head>
 <body>
@@ -76,7 +74,6 @@
         <h2 style="color: gold; text-align: center;">Կշիռների Լաբորատորիա</h2>
         <div id="sliders-container"></div>
         <button class="btn-calc" onclick="calculateWinner()">🥇 ԳՏՆԵԼ ԼԱՎԱԳՈՒՅՆԻՆ</button>
-
         <div id="result-area">
             <h2 style="color: gold; margin-top: 0;">Լավագույնը՝ <span id="winner-name"></span></h2>
             <p>Վերջնական միավորը՝ <strong id="winner-score"></strong> / 100</p>
@@ -85,14 +82,14 @@
     </div>
 
     <div id="schedulePage" class="page">
-        <h2 style="color: gold; text-align: center;">Մարզիկի Օրակարգը</h2>
+        <h2 style="color: gold; text-align: center;">Օրվա Ռեժիմի Վերլուծություն</h2>
         <div style="text-align:center; margin-bottom:20px;">
-            <select id="scheduleSelect" onchange="updateScheduleChart()" style="width:60%;"></select>
+            <select id="scheduleSelect" onchange="updateScheduleChart()" style="width:50%;"></select>
         </div>
         <div class="schedule-container">
             <img id="scheduleImg" src="">
-            <div style="width:350px; height:350px;">
-                <canvas id="doughnutChart"></canvas>
+            <div class="line-chart-box">
+                <canvas id="lineChart"></canvas>
             </div>
         </div>
     </div>
@@ -112,7 +109,8 @@ const athletes = [
 ];
 
 const labels = ['Ուժ', 'Դիմացկունություն', 'Տեխնիկա', 'Արագություն', 'Փորձ'];
-let myChart, doughnutChart;
+const schedLabels = ['Քուն (ժամ)', 'Մարզում (ժամ)', 'Սնունդ (ժամ)', 'Հանգիստ (ժամ)'];
+let myChart, lineChart;
 
 function init() {
     const s1 = document.getElementById('sel1');
@@ -122,9 +120,7 @@ function init() {
 
     athletes.forEach(a => {
         const opt = `<option value="${a.id}">${a.name}</option>`;
-        s1.innerHTML += opt;
-        s2.innerHTML += opt;
-        sSched.innerHTML += opt;
+        s1.innerHTML += opt; s2.innerHTML += opt; sSched.innerHTML += opt;
     });
 
     labels.forEach((label, i) => {
@@ -132,8 +128,7 @@ function init() {
             <div class="slider-box">
                 <label>${label} <span id="p${i}">20%</span></label>
                 <input type="range" id="w${i}" min="0" max="100" value="20" oninput="syncWeights()">
-            </div>
-        `;
+            </div>`;
     });
 
     s2.selectedIndex = 1;
@@ -200,14 +195,31 @@ function calculateWinner() {
 function updateScheduleChart() {
     const a = athletes[document.getElementById('scheduleSelect').value];
     document.getElementById('scheduleImg').src = a.img;
-    if (doughnutChart) doughnutChart.destroy();
-    doughnutChart = new Chart(document.getElementById('doughnutChart'), {
-        type: 'doughnut',
+    if (lineChart) lineChart.destroy();
+    lineChart = new Chart(document.getElementById('lineChart'), {
+        type: 'line',
         data: {
-            labels: ['Քուն', 'Մարզում', 'Սնունդ', 'Հանգիստ'],
-            datasets: [{ data: a.schedule, backgroundColor: ['#4e73df', '#f6c23e', '#e74a3b', '#1cc88a'], borderWidth: 0 }]
+            labels: schedLabels,
+            datasets: [{
+                label: 'Ժամաքանակ',
+                data: a.schedule,
+                borderColor: 'gold',
+                backgroundColor: 'rgba(212, 175, 55, 0.2)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointBackgroundColor: 'white'
+            }]
         },
-        options: { plugins: { legend: { position: 'bottom', labels: { color: 'white' } } }, cutout: '65%' }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { min: 0, max: 12, grid: { color: '#444' }, ticks: { color: 'white' } },
+                x: { grid: { display: false }, ticks: { color: 'white' } }
+            },
+            plugins: { legend: { display: false } }
+        }
     });
 }
 
@@ -215,4 +227,3 @@ init();
 </script>
 </body>
 </html>
-
