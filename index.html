@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAY-STATS PRO | Մաթեմատիկական Մոդելավորում</title>
+    <title>HAY-STATS PRO | Մարզիկների Վերլուծություն</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #121212; color: white; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* Վերևի մենյուն */
         header { background: #1a1a1a; width: 100%; padding: 20px 0; text-align: center; border-bottom: 2px solid gold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .nav-buttons { margin-top: 15px; }
-        .nav-btn { background: none; border: 2px solid gold; color: gold; padding: 10px 25px; font-size: 16px; font-weight: bold; cursor: pointer; margin: 0 10px; border-radius: 30px; transition: 0.3s; }
+        .nav-btn { background: none; border: 2px solid gold; color: gold; padding: 10px 20px; font-size: 14px; font-weight: bold; cursor: pointer; margin: 5px; border-radius: 30px; transition: 0.3s; }
         .nav-btn.active { background: gold; color: black; }
         .nav-btn:hover { background: rgba(212, 175, 55, 0.2); }
 
@@ -19,7 +18,7 @@
         .page { display: none; background: #1e1e1e; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
         .active-page { display: block; }
 
-        /* ԲԱԺԻՆ 1. Համեմատություն */
+        /* Բաժին 1. Համեմատություն */
         .selectors { display: flex; justify-content: space-between; margin-bottom: 30px; }
         select { padding: 12px; border-radius: 8px; background: #2a2a2a; color: gold; border: 1px solid gold; width: 48%; font-size: 16px; outline: none; }
         .comparison-display { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; }
@@ -27,18 +26,17 @@
         .athlete-info img { width: 130px; height: 130px; border-radius: 50%; border: 3px solid gold; object-fit: cover; margin-bottom: 10px; }
         .chart-box { width: 400px; height: 400px; }
 
-        /* ԲԱԺԻՆ 2. Հաշվարկ */
-        .lab-title { color: gold; text-align: center; margin-bottom: 25px; }
+        /* Բաժին 2. Հաշվարկ */
         .slider-box { margin-bottom: 20px; }
         .slider-box label { display: flex; justify-content: space-between; font-weight: bold; color: #ddd; margin-bottom: 8px; }
         input[type="range"] { width: 100%; accent-color: gold; cursor: pointer; }
         .btn-calc { background: gold; color: black; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
-        .btn-calc:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4); }
-
         #result-area { margin-top: 25px; padding: 20px; border-radius: 12px; background: rgba(212, 175, 55, 0.05); border: 1px dashed gold; display: none; text-align: center; }
-        .math-formula { font-family: 'Courier New', monospace; background: #000; padding: 15px; border-radius: 8px; color: #0f0; margin-top: 15px; text-align: left; font-size: 14px; overflow-x: auto; }
+        .math-formula { font-family: monospace; background: #000; padding: 15px; border-radius: 8px; color: #0f0; margin-top: 15px; text-align: left; font-size: 13px; }
 
-        @media (max-width: 700px) { .chart-box { width: 300px; height: 300px; } .selectors { flex-direction: column; gap: 10px; } select { width: 100%; } }
+        /* Բաժին 3. Օրվա Գրաֆիկ */
+        .schedule-container { display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap; margin-top: 20px; }
+        #scheduleImg { width: 220px; height: 220px; border-radius: 15px; border: 2px solid gold; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -46,8 +44,9 @@
 <header>
     <h1>HAY-STATS PRO</h1>
     <div class="nav-buttons">
-        <button class="nav-btn active" onclick="showPage('compPage', this)">📊 ՄԱՐԶԻԿՆԵՐԻ ՀԱՄԵՄԱՏՈՒՄ</button>
-        <button class="nav-btn" onclick="showPage('mathPage', this)">🧮 ՄԱԹԵՄԱՏԻԿԱԿԱՆ ՀԱՇՎԱՐԿ</button>
+        <button class="nav-btn active" onclick="showPage('compPage', this)">📊 ՀԱՄԵՄԱՏՈՒՄ</button>
+        <button class="nav-btn" onclick="showPage('mathPage', this)">🧮 ՀԱՇՎԱՐԿԻ ՄՈԴԵԼ</button>
+        <button class="nav-btn" onclick="showPage('schedulePage', this)">📅 ՕՐՎԱ ԳՐԱՖԻԿ</button>
     </div>
 </header>
 
@@ -74,14 +73,27 @@
     </div>
 
     <div id="mathPage" class="page">
-        <h2 class="lab-title">Կշիռների Լաբորատորիա</h2>
+        <h2 style="color: gold; text-align: center;">Կշիռների Լաբորատորիա</h2>
         <div id="sliders-container"></div>
         <button class="btn-calc" onclick="calculateWinner()">🥇 ԳՏՆԵԼ ԼԱՎԱԳՈՒՅՆԻՆ</button>
 
         <div id="result-area">
-            <h2 style="color: gold; margin-top: 0;">Լավագույն մարզիկը՝ <span id="winner-name"></span></h2>
+            <h2 style="color: gold; margin-top: 0;">Լավագույնը՝ <span id="winner-name"></span></h2>
             <p>Վերջնական միավորը՝ <strong id="winner-score"></strong> / 100</p>
             <div class="math-formula" id="math-formula"></div>
+        </div>
+    </div>
+
+    <div id="schedulePage" class="page">
+        <h2 style="color: gold; text-align: center;">Մարզիկի Օրակարգը</h2>
+        <div style="text-align:center; margin-bottom:20px;">
+            <select id="scheduleSelect" onchange="updateScheduleChart()" style="width:60%;"></select>
+        </div>
+        <div class="schedule-container">
+            <img id="scheduleImg" src="">
+            <div style="width:350px; height:350px;">
+                <canvas id="doughnutChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -89,29 +101,45 @@
 
 <script>
 const athletes = [
-    { id: 0, name: "Արման Ծառուկյան", stats: [88, 95, 92, 90, 82], img: "images/IMG_20260321_135710.jpg" },
-    { id: 1, name: "Արթուր Ալեքսանյան", stats: [98, 92, 96, 78, 100], img: "images/IMG_20260321_135339.jpg" },
-    { id: 2, name: "Հենրիխ Մխիթարյան", stats: [72, 88, 98, 85, 95], img: "images/IMG_20260321_135925.jpg" },
-    { id: 3, name: "Վարազդատ Լալայան", stats: [100, 65, 88, 72, 85], img: "images/IMG_20260321_140028.jpg" },
-    { id: 4, name: "Լևոն Արոնյան", stats: [40, 80, 100, 60, 98], img: "images/IMG_20260321_140328.jpg" },
-    { id: 5, name: "Սիմոն Մարտիրոսյան", stats: [99, 70, 92, 75, 94], img: "images/IMG_20260321_140452.jpg" },
-    { id: 6, name: "Արսեն Ջուլֆալակյան", stats: [90, 94, 94, 82, 96], img: "images/IMG_20260321_140656.jpg" },
-    { id: 7, name: "Էդուարդ Սպերցյան", stats: [75, 85, 92, 88, 75], img: "images/IMG_20260321_140749.jpg" }
+    { id: 0, name: "Արման Ծառուկյան", stats: [88, 95, 92, 90, 82], img: "images/IMG_20260321_135710.jpg", schedule: [8, 6, 3, 7] },
+    { id: 1, name: "Արթուր Ալեքսանյան", stats: [98, 92, 96, 78, 100], img: "images/IMG_20260321_135339.jpg", schedule: [9, 5, 4, 6] },
+    { id: 2, name: "Հենրիխ Մխիթարյան", stats: [72, 88, 98, 85, 95], img: "images/IMG_20260321_135925.jpg", schedule: [8, 4, 3, 9] },
+    { id: 3, name: "Վարազդատ Լալայան", stats: [100, 65, 88, 72, 85], img: "images/IMG_20260321_140028.jpg", schedule: [8, 7, 4, 5] },
+    { id: 4, name: "Լևոն Արոնյան", stats: [40, 80, 100, 60, 98], img: "images/IMG_20260321_140328.jpg", schedule: [7, 8, 2, 7] },
+    { id: 5, name: "Սիմոն Մարտիրոսյան", stats: [99, 70, 92, 75, 94], img: "images/IMG_20260321_140452.jpg", schedule: [8, 6, 4, 6] },
+    { id: 6, name: "Արսեն Ջուլֆալակյան", stats: [90, 94, 94, 82, 96], img: "images/IMG_20260321_140656.jpg", schedule: [8, 5, 3, 8] },
+    { id: 7, name: "Էդուարդ Սպերցյան", stats: [75, 85, 92, 88, 75], img: "images/IMG_20260321_140749.jpg", schedule: [8, 4, 3, 9] }
 ];
 
 const labels = ['Ուժ', 'Դիմացկունություն', 'Տեխնիկա', 'Արագություն', 'Փորձ'];
-let myChart;
+let myChart, doughnutChart;
 
-// Սլայդերների ստեղծում
-const slidersDiv = document.getElementById('sliders-container');
-labels.forEach((label, i) => {
-    slidersDiv.innerHTML += `
-        <div class="slider-box">
-            <label>${label} <span id="p${i}">20%</span></label>
-            <input type="range" id="w${i}" min="0" max="100" value="20" oninput="syncP()">
-        </div>
-    `;
-});
+function init() {
+    const s1 = document.getElementById('sel1');
+    const s2 = document.getElementById('sel2');
+    const sSched = document.getElementById('scheduleSelect');
+    const slidersDiv = document.getElementById('sliders-container');
+
+    athletes.forEach(a => {
+        const opt = `<option value="${a.id}">${a.name}</option>`;
+        s1.innerHTML += opt;
+        s2.innerHTML += opt;
+        sSched.innerHTML += opt;
+    });
+
+    labels.forEach((label, i) => {
+        slidersDiv.innerHTML += `
+            <div class="slider-box">
+                <label>${label} <span id="p${i}">20%</span></label>
+                <input type="range" id="w${i}" min="0" max="100" value="20" oninput="syncWeights()">
+            </div>
+        `;
+    });
+
+    s2.selectedIndex = 1;
+    updateChart();
+    updateScheduleChart();
+}
 
 function showPage(pageId, btn) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
@@ -119,9 +147,10 @@ function showPage(pageId, btn) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     if(pageId === 'compPage') updateChart();
+    if(pageId === 'schedulePage') updateScheduleChart();
 }
 
-function syncP() {
+function syncWeights() {
     let total = 0;
     for(let i=0; i<5; i++) total += parseInt(document.getElementById(`w${i}`).value);
     if(total === 0) total = 1;
@@ -149,56 +178,41 @@ function updateChart() {
                 { label: a2.name, data: a2.stats, backgroundColor: 'rgba(255, 255, 255, 0.1)', borderColor: 'white', borderWidth: 2 }
             ]
         },
-        options: { 
-            scales: { r: { min: 0, max: 100, grid: { color: '#444' }, angleLines: { color: '#444' }, pointLabels: { color: '#fff' }, ticks: { display: false } } },
-            plugins: { legend: { display: false } }
-        }
+        options: { scales: { r: { min: 0, max: 100, grid: { color: '#444' }, ticks: { display: false } } }, plugins: { legend: { display: false } } }
     });
 }
 
 function calculateWinner() {
-    let w = [];
-    let totalW = 0;
-    for(let i=0; i<5; i++) {
-        let val = parseInt(document.getElementById(`w${i}`).value);
-        w.push(val);
-        totalW += val;
-    }
-
-    let winner = null;
-    let maxS = -1;
-    let bestFormula = "";
-
+    let w = [], totalW = 0;
+    for(let i=0; i<5; i++) { w.push(parseInt(document.getElementById(`w${i}`).value)); totalW += w[i]; }
+    let winner = null, maxS = -1, formula = "";
     athletes.forEach(a => {
-        let score = 0;
-        let formulaParts = [];
-        a.stats.forEach((s, i) => {
-            let p = w[i]/totalW;
-            score += s * p;
-            formulaParts.push(`(${p.toFixed(2)} × ${s})`);
-        });
-        if(score > maxS) {
-            maxS = score;
-            winner = a;
-            bestFormula = formulaParts.join(" + ");
-        }
+        let score = 0, parts = [];
+        a.stats.forEach((s, i) => { let p = w[i]/totalW; score += s * p; parts.push(`(${p.toFixed(2)}×${s})`); });
+        if(score > maxS) { maxS = score; winner = a; formula = parts.join(" + "); }
     });
-
     document.getElementById('result-area').style.display = 'block';
     document.getElementById('winner-name').innerText = winner.name;
     document.getElementById('winner-score').innerText = maxS.toFixed(1);
-    document.getElementById('math-formula').innerHTML = `<strong>Մոդել՝</strong> Σ (կշիռ × արդյունք)<br>S = ${bestFormula} = ${maxS.toFixed(1)}`;
+    document.getElementById('math-formula').innerHTML = `Մոդել՝ S = ${formula} = ${maxS.toFixed(1)}`;
 }
 
-// Սկզբնականացում
-const s1 = document.getElementById('sel1');
-const s2 = document.getElementById('sel2');
-athletes.forEach(a => {
-    s1.innerHTML += `<option value="${a.id}">${a.name}</option>`;
-    s2.innerHTML += `<option value="${a.id}">${a.name}</option>`;
-});
-s2.selectedIndex = 1;
-updateChart();
+function updateScheduleChart() {
+    const a = athletes[document.getElementById('scheduleSelect').value];
+    document.getElementById('scheduleImg').src = a.img;
+    if (doughnutChart) doughnutChart.destroy();
+    doughnutChart = new Chart(document.getElementById('doughnutChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Քուն', 'Մարզում', 'Սնունդ', 'Հանգիստ'],
+            datasets: [{ data: a.schedule, backgroundColor: ['#4e73df', '#f6c23e', '#e74a3b', '#1cc88a'], borderWidth: 0 }]
+        },
+        options: { plugins: { legend: { position: 'bottom', labels: { color: 'white' } } }, cutout: '65%' }
+    });
+}
+
+init();
 </script>
 </body>
 </html>
+
